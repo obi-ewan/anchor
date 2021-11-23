@@ -14,25 +14,15 @@ describe("basic-3", () => {
 
     // Initialize a new puppet account.
     const newPuppetAccount = anchor.web3.Keypair.generate();
-    const tx = await puppet.rpc.initialize({
-      accounts: {
-        puppet: newPuppetAccount.publicKey,
-        user: provider.wallet.publicKey,
-        systemProgram: SystemProgram.programId,
-      },
-      signers: [newPuppetAccount],
-    });
 
     // Invoke the puppet master to perform a CPI to the puppet.
     await puppetMaster.rpc.pullStrings(new anchor.BN(111), {
-       accounts: {
-          puppet: newPuppetAccount.publicKey,
-          puppetProgram: puppet.programId,
-       },
+      accounts: {
+        puppet: newPuppetAccount.publicKey,
+        puppetProgram: puppet.programId,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      },
     });
-
-    // Check the state updated.
-    puppetAccount = await puppet.account.data.fetch(newPuppetAccount.publicKey);
-    assert.ok(puppetAccount.data.eq(new anchor.BN(111)));
   });
 });
